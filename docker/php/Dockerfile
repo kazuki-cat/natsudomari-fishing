@@ -1,12 +1,12 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # システムパッケージをインストール
 RUN apk add --no-cache \
     git \
     curl \
-    libpng-dev \     # PNG画像処理
-    libxml2-dev \    # XML処理(Laravel内部で使用)
-    libzip-dev \     # ZIP解凍
+    libpng-dev \
+    libxml2-dev \
+    libzip-dev \
     zip \
     unzip \
     oniguruma-dev
@@ -16,10 +16,10 @@ RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     mbstring \
-    exif \           # 画像のメタデータ読み取り
-    pcntl \          # プロセス制御
-    bcmath \         # 高精度な数値計算
-    gd \             # 画像のリサイズ
+    exif \
+    pcntl \
+    bcmath \
+    gd \
     zip
 
 # Composerをインストール
