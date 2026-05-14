@@ -5,8 +5,8 @@
 ---
 
 ## 画像イメージ
-※完成後に追加予定
----
+
+## ※完成後に追加予定
 
 ## 機能
 
@@ -20,16 +20,17 @@
 
 ## 技術スタック
 
-| カテゴリ | 技術 |
-|---|---|
-| フロントエンド| Nuxt.js 3 / TypeScript / TailwindCSS|
-| バックエンド | Laravel 11 (PHP 8.2 ) / Laravel Sanctum |
-| データベース | MySQL 8.0 |
-| 天気データ | 気象庁API (無料・APIキー不要) |
-| 地図 | Leaflet.js + OpenStreetMap |
-| ファイル保存 | AWS S3 |
-| インフラ | AWS EC2 + RDS |
-| 開発環境 | Docker / Nginx |
+| カテゴリ       | 技術                                    |
+| -------------- | --------------------------------------- |
+| フロントエンド | Nuxt.js 3 / TypeScript / TailwindCSS    |
+| バックエンド   | Laravel 11 (PHP 8.2 ) / Laravel Sanctum |
+| データベース   | MySQL 8.0                               |
+| 天気データ     | 気象庁API (無料・APIキー不要)           |
+| 地図           | Leaflet.js + OpenStreetMap              |
+| ファイル保存   | AWS S3                                  |
+| インフラ       | AWS EC2 + RDS                           |
+| 開発環境       | Docker / Nginx                          |
+
 ---
 
 ## ローカル起動手順
@@ -45,6 +46,7 @@ docker compose up -d
 - API: http://localhost/api
 
 ---
+
 ## 作者
-kazuki
----
+
+## kazuki

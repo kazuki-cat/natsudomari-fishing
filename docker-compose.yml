@@ -1,0 +1,49 @@
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend:/var/www/backend
+    depends_on:
+      - php
+      - node
+
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./backend:/var/www/backend
+    depends_on:
+      - mysql
+
+  node:
+    build:
+      context: ./docker/node
+    volumes:
+      - ./frontend:/app
+    environment:
+      - HOST=0.0.0.0 # コンテナ外(ブラウザ)からアクセスできるようにする
+      - CHOKIDAR_USEPOLLING=true # ファイル監視の方式(Docker環境でのホットリロードに必要)
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: fishing_app # 開発用DB名
+      MYSQL_ROOT_PASSWORD: secret # 開発用のみ・本番では.envで管理
+      MYSQL_USER: fishing_user # 開発用ユーザー
+      MYSQL_PASSWORD: fishing_pass # 開発用のみ・本番では.envで管理
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3303:3306"
+    healthcheck:
+      # mysqlが完全に起動してから他のサービスが接続するよう準備完了チェック
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data: # mysqlコンテナのデータ保存先
