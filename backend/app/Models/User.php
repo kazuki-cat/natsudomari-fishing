@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, // APIトークン認証(Sanctum)
+        HasFactory,   // テスト用ダミーデータ生成
+        Notifiable;   // メール通知機能
 
     // UserはCatchReportをhasMany(一対多)
     public function catchReports(): HasMany
