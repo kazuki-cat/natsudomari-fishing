@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   // 開発者ツールの有無
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   // 使用するNuxtモジュール
   modules: ["@nuxtjs/tailwindcss"],
   // グローバルCSSの読み込み
