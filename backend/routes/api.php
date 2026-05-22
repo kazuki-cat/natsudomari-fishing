@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WeatherController;
 
 // ユーザー登録(POST /api/register)
 Route::post('/register', [AuthController::class, 'register']);
@@ -19,3 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ログアウト(POST /api/logout)
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+// 天気・営業予報(GET / api/weather)
+Route::get('/weather', [WeatherController::class, 'index']);
