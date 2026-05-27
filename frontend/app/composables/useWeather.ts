@@ -44,5 +44,6 @@ export const useWeather = () => {
     }
   };
 
+  // 外部から使える値と関数を返す
   return { weather, loading, error, operationStatus, fetchWeather };
 };
