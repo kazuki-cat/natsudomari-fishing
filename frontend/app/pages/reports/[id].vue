@@ -105,6 +105,19 @@ const handleDelete = async () => {
             {{ report.memo }}
           </p>
         </div>
+
+        <!-- 釣れた場所のミニマップ(座標がある投稿のみ表示) -->
+        <div v-if="report.latitude && report.longitude" class="mt-4">
+          <p class="text-sm font-medium text-gray-700 mb-2">📍 釣れた場所</p>
+          <!-- ClientOnly = Leafletはブラウザ専用のため必須 -->
+          <ClientOnly>
+            <CatchSpotMap
+              :latitude="report.latitude"
+              :longitude="report.longitude"
+              :image-path="report.image_path"
+            />
+          </ClientOnly>
+        </div>
       </div>
     </template>
   </div>
