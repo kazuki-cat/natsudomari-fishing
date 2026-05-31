@@ -90,6 +90,12 @@ export const useCatchReports = () => {
     await apiFetch(`/api/reports/${id}`, { method: "DELETE" });
   };
 
+  // マップ表示用(座標付き釣果の全権取得)
+  const fetchMapReports = async () => {
+    // GET /api/reports/map
+    return await $fetch<{ data: CatchReport[] }>("/api/reports/map");
+  };
+
   // 外部から使える値と関数を返す
   return {
     reports,
@@ -98,6 +104,7 @@ export const useCatchReports = () => {
     lastPage,
     fetchReports,
     fetchReport,
+    fetchMapReports,
     createReport,
     deleteReport,
   };

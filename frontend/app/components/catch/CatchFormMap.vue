@@ -40,7 +40,17 @@ onMounted(() => {
   if (!mapContainer.value) return;
 
   // マップを初期化(夏泊半島を中心に表示)
-  map = L.map(mapContainer.value).setView([41.002, 140.88361], 13);
+  map = L.map(mapContainer.value, {
+    // パン(スクロール)できる範囲を制限する
+    maxBounds: [
+      [40.7, 140.64], // 左下(南西)の境界
+      [41.2, 141.2], // 右上(北東)の境界
+    ],
+    // 境界での跳ね返り強度(0=滑らかに超える / 1=ぴったり止まる)
+    maxBoundsViscosity: 1.0,
+    // これ以上ズームアウトできない最小ズームレベル
+    minZoom: 11,
+  }).setView([41.002, 140.88361], 13); // 初期表示位置
 
   // タイルレイヤーを追加(地図の背景画像)
   // OpenStreetMapのサーバーから地図画(タイル)を取得して表示
