@@ -1,16 +1,23 @@
 <script setup lang="ts">
 // 釣果詳細ページ([id] = 動的ルート)
-import type { CatchReport } from "~/types/catchReport";
+import type { CatchReport, Comment } from "~/types/catchReport";
 
 // 現在のルート情報(URLパラメータ・クエリ等)を取得
 const route = useRoute();
 
-const { fetchReport, deleteReport } = useCatchReports();
+const { fetchReport, deleteReport, fetchComments, createComment } =
+  useCatchReports();
 const { user, isLoggedIn } = useAuth();
 const router = useRouter();
 
 // 釣果データ(APIから取得後に格納)
 const report = ref<CatchReport | null>(null);
+// コメントリスト
+const comments = ref<Comment[]>([]);
+// 新しいコメントの入力値
+const newComment = ref("");
+// コメント送信中フラグ
+const submitting = ref(false);
 
 // 日付を日本語形式にフォーマットする関数
 // 'YYYY-MM-DD' → 'YYYY年M月D日'
@@ -19,10 +26,14 @@ const formatDate = (dateStr: string) => {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 };
 
-// ページ表示時に釣果詳細を取得してreportに格納
+// ページ表示時に釣果詳細とコメントを同時に取得(Promise.allで並列実行して速くする)
 onMounted(async () => {
-  const reportData = await fetchReport(Number(route.params.id));
+  const [reportData, commentData] = await Promise.all([
+    fetchReport(Number(route.params.id)),
+    fetchComments(Number(route.params.id)),
+  ]);
   report.value = reportData.data;
+  comments.value = commentData.data;
 });
 
 // 削除処理
@@ -31,6 +42,20 @@ const handleDelete = async () => {
   if (!confirm("この投稿を削除しますか？")) return;
   await deleteReport(Number(route.params.id));
   router.push("/reports");
+};
+
+// コメント送信処理
+const submitComment = async () => {
+  if (!newComment.value.trim()) return; // 空白のみコメントはスキップ
+  submitting.value = true;
+  try {
+    const data = await createComment(Number(route.params.id), newComment.value);
+    // 送信したコメントをリストに追加(ページリロードなしで即反映)
+    comments.value.unshift((data as any).data);
+    newComment.value = "";
+  } finally {
+    submitting.value = false;
+  }
 };
 </script>
 
@@ -118,6 +143,64 @@ const handleDelete = async () => {
             />
           </ClientOnly>
         </div>
+      </div>
+
+      <!-- コメントセクション -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="font-bold text-sea-700 mb-4">
+          💬 コメント（{{ comments.length }}件）
+        </h2>
+
+        <!-- コメントリスト -->
+        <div class="space-y-3 mb-5">
+          <div
+            v-for="comment in comments"
+            :key="comment.id"
+            class="bg-sea-50 rounded-lg px-4 py-3 text-sm"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-medium text-sea-700">{{
+                comment.user.name
+              }}</span
+              ><span class="text-xs text-gray-400">{{
+                formatDate(comment.created_at)
+              }}</span>
+            </div>
+            <p class="text-gray-700">{{ comment.body }}</p>
+          </div>
+          <p v-if="comments.length === 0" class="text-gray-400 text-sm">
+            まだコメントはありません
+          </p>
+        </div>
+
+        <!-- コメント入力フォーム(ログイン時のみ表示) -->
+        <div v-if="isLoggedIn">
+          <textarea
+            v-model="newComment"
+            rows="2"
+            maxLength="300"
+            placeholder="コメントを入力..."
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sea-400 resize-none"
+          />
+          <p class="text-xs text-gray-400 mt-1 text-right">
+            {{ newComment.length }} / 300文字以内
+          </p>
+          <!-- :disabled = 送信中またはコメントがからの時はボタン無効 -->
+          <button
+            :disabled="submitting || !newComment.trim()"
+            class="bg-sea-600 hover:bg-sea-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            @click="submitComment"
+          >
+            送信
+          </button>
+        </div>
+
+        <!-- 未ログイン時はログインを促す -->
+        <p v-else class="text-sm text-gray-400">
+          <NuxtLink to="/auth/login" class="text-sea-600 underline"
+            >ログイン</NuxtLink
+          >してコメントする
+        </p>
       </div>
     </template>
   </div>
