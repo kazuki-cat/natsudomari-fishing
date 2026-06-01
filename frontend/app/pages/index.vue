@@ -2,8 +2,28 @@
 // トップページ:天気・営業予報を表示する
 // ログイン不要で誰でも閲覧できる
 
+useHead({ title: "営業予報" });
+
 // useWeather.tsから必要な値と関数を取得
 const { weather, loading, error, operationStatus, fetchWeather } = useWeather();
+
+// 週間予報の表示リスト
+// 気象庁APIが今日を含んで返す場合は今日をスキップ、明日からの場合はそのまま表示
+const displayForecast = computed(() => {
+  if (!weather.value?.forecast?.length) return [];
+  const today = new Date();
+  // 今日の日付を"MM/DD形式に変換
+  const todayStr =
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    String(today.getDate()).padStart(2, "0");
+  // 週間予報の1件目の日付
+  const firstDate = weather.value.forecast[0]?.date ?? "";
+  // 1件目が今日ならslice(1)で今日をスキップ、明日以降ならそのまま全件返す
+  return firstDate.startsWith(todayStr)
+    ? weather.value.forecast.slice(1)
+    : weather.value.forecast;
+});
 
 // コンポーネントがマウントされたとき(ページ表示時)に実行
 // APIを叩いて天気データを取得する
@@ -74,7 +94,7 @@ onMounted(fetchWeather);
               <!-- v-for で6日分の予報を繰り返し表示 -->
               <!-- :key は各行のユニークなキー(Vueのリスト最適化に必要) -->
               <tr
-                v-for="day in weather.forecast.slice(1)"
+                v-for="day in displayForecast"
                 :key="day.date"
                 class="border-b last:border-0 hover:bg-sea-50 transition"
               >

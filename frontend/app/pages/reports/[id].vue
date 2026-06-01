@@ -1,5 +1,8 @@
 <script setup lang="ts">
 // 釣果詳細ページ([id] = 動的ルート)
+
+useHead({ title: "釣果詳細" });
+
 import type { CatchReport, Comment } from "~/types/catchReport";
 
 // 現在のルート情報(URLパラメータ・クエリ等)を取得
