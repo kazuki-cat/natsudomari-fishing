@@ -3,6 +3,8 @@
 // フィルター(魚種・仕掛け・釣り場名)とソート(新しい順・古い順)に対応
 // ページネーションで10件ずつ表示
 
+useHead({ title: "釣果タイムライン" });
+
 const { reports, loading, currentPage, lastPage, fetchReports } =
   useCatchReports();
 const { isLoggedIn } = useAuth();

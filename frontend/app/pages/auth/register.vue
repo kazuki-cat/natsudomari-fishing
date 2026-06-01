@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "新規登録" });
+
 const { register } = useAuth();
 const router = useRouter();
 

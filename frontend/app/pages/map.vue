@@ -2,6 +2,8 @@
 // 釣り場マップページ(座標付きの釣果投稿を地図上に魚種ごとにアイコン表示)
 // 詳細ページからフォーカス遷移した場合は特定の場所を拡大表示する
 
+useHead({ title: "釣り場マップ" });
+
 import type { CatchReport } from "~/types/catchReport";
 
 const { fetchMapReports } = useCatchReports();

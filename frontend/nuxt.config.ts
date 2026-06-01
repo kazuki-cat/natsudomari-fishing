@@ -28,7 +28,6 @@ export default defineNuxtConfig({
   // <head>タグの設定(SEO・メタ情報)
   app: {
     head: {
-      title: "夏泊ボート釣り情報",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },

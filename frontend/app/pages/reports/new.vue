@@ -2,6 +2,8 @@
 // 釣果投稿フォームページ(ログインしているユーザーのみアクセス可)
 // 投稿完了後は /reports(タイムライン)にリダイレクトする
 
+useHead({ title: "釣果を投稿" });
+
 import type { CatchReportForm } from "~/types/catchReport";
 
 // middleware/auth.tsにてログイン済みユーザーか確認
@@ -10,7 +12,7 @@ definePageMeta({ middleware: "auth" });
 const { createReport } = useCatchReports();
 const router = useRouter();
 const submitting = ref(false);
-const errorMsg = ref<string | null>(null);
+const errorMessages = ref<string[]>([]);
 
 // 魚種の選択肢(夏泊半島周辺で良く釣れる魚)
 const fishOptions = [
@@ -91,24 +93,31 @@ const onImageChange = (e: Event) => {
 // フォーム送信処理
 // バリデーション → APIで投稿 → タイムラインへリダイレクト
 const onSubmit = async () => {
-  // 必須項目が空の場合はAPIを叩かずにエラー表示
-  if (!form.fish_name || !form.tackle || !form.location_name) {
-    errorMsg.value = "必須項目を入力してください";
-    return;
-  }
-  // iPhon(IOS)のSafariはmax属性を無視する可能性あるた必須項目チェック
+  console.log("caught_at:", form.caught_at);
+  console.log("today:", new Date().toLocaleDateString("sv"));
+  const errors: string[] = [];
+
+  // 各必須項目のバリデーション
   if (form.caught_at > new Date().toLocaleDateString("sv")) {
-    errorMsg.value = "釣れた日は今日以前の日付を選択してください";
+    errors.push("釣れた日は今日以前の日付を選択してください");
+  }
+  if (!form.fish_name) errors.push("魚種を選択してください");
+  if (!form.tackle) errors.push("仕掛けを選択してください");
+  if (!form.location_name) errors.push("釣り場名を選択してください");
+
+  // エラーがあれば表示して送信を中止
+  if (errors.length > 0) {
+    errorMessages.value = errors;
     return;
   }
+
   submitting.value = true;
-  errorMsg.value = null;
+  errorMessages.value = []; // 送信前にエラーをリセット
   try {
     await createReport(form);
-    // 投稿成功後はタイムラインページに遷移
-    router.push("/reports");
+    router.push("/reports"); // 投稿成功後はタイムラインへ遷移
   } catch {
-    errorMsg.value = "投稿に失敗しました。もう一度お試しください。";
+    errorMessages.value = ["投稿に失敗しました。もう一度お試しください。"];
   } finally {
     submitting.value = false;
   }
@@ -122,13 +131,6 @@ const onSubmit = async () => {
       class="bg-white rounded-xl shadow p-6 space-y-5"
       @submit.prevent="onSubmit"
     >
-      <div
-        v-if="errorMsg"
-        class="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-sm"
-      >
-        {{ errorMsg }}
-      </div>
-
       <!-- 釣れた日(今日より未来は選択不可) -->
       <div>
         <label
@@ -140,7 +142,6 @@ const onSubmit = async () => {
           id="caught_at"
           v-model="form.caught_at"
           type="date"
-          required
           :max="new Date().toLocaleDateString('sv')"
           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sea-400"
         />
@@ -159,7 +160,6 @@ const onSubmit = async () => {
         <select
           id="fish_name"
           v-model="form.fish_name"
-          required
           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sea-400 bg-white"
         >
           <option value="" disabled>選択してください</option>
@@ -177,7 +177,6 @@ const onSubmit = async () => {
         <select
           id="tackle"
           v-model="form.tackle"
-          required
           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sea-400 bg-white"
         >
           <option value="" disabled>選択してください</option>
@@ -202,7 +201,6 @@ const onSubmit = async () => {
         <select
           id="location_name"
           v-model="form.location_name"
-          required
           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sea-400 bg-white"
         >
           <option value="" disabled>選択してください</option>
@@ -264,6 +262,18 @@ const onSubmit = async () => {
         <p class="text-xs text-gray-400 mt-1 text-right">
           {{ form.memo.length }} / 1000文字以内
         </p>
+      </div>
+
+      <!-- エラーメッセージ -->
+      <div
+        v-if="errorMessages.length > 0"
+        class="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-sm"
+      >
+        <ul class="space-y-1">
+          <li v-for="msg in errorMessages" :key="msg" class="text-red-600">
+            ・{{ msg }}
+          </li>
+        </ul>
       </div>
 
       <button
