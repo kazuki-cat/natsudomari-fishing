@@ -76,7 +76,7 @@ const handleLogout = async () => {
     <!-- モバイル用ドロワーメニュー(mobileOpenがtrueのとき表示) -->
     <div
       v-if="mobileOpen"
-      class="md:hidden bg-sea-800 px-4 py-3 flex flex-col gap-3 text-sm"
+      class="md:hidden bg-sea-800 px-4 py-3 flex flex-col items-center gap-4 text-sm"
     >
       <NuxtLink to="/" class="hover:text-sea-200" @click="mobileOpen = false"
         >営業予報</NuxtLink
@@ -97,7 +97,7 @@ const handleLogout = async () => {
           @click="mobileOpen = false"
           >釣果を投稿</NuxtLink
         >
-        <button class="text-left hover:text-sea-200" @click="handleLogout">
+        <button class=" hover:text-sea-200" @click="handleLogout">
           ログアウト
         </button>
       </template>
