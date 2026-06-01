@@ -1,5 +1,9 @@
 // 釣果投稿のCRUD操作をまとめたComposable
-import type { CatchReport, CatchReportForm } from "~/types/catchReport";
+import type {
+  CatchReport,
+  CatchReportForm,
+  Comment,
+} from "~/types/catchReport";
 
 export const useCatchReports = () => {
   // タイムラインの釣果リスト
@@ -96,6 +100,23 @@ export const useCatchReports = () => {
     return await $fetch<{ data: CatchReport[] }>("/api/reports/map");
   };
 
+  // コメント一覧取得
+  const fetchComments = async (reportId: number) => {
+    // 例: GET /api/reports/1/comments
+    return await $fetch<{ data: Comment[] }>(
+      `/api/reports/${reportId}/comments`,
+    );
+  };
+
+  // コメント投稿
+  const createComment = async (reportId: number, body: string) => {
+    // 例: POST /api/reports/1/comments
+    return await apiFetch(`/api/reports/${reportId}/comments`, {
+      method: "POST",
+      body: { body },
+    });
+  };
+
   // 外部から使える値と関数を返す
   return {
     reports,
@@ -107,5 +128,7 @@ export const useCatchReports = () => {
     fetchMapReports,
     createReport,
     deleteReport,
+    fetchComments,
+    createComment,
   };
 };
