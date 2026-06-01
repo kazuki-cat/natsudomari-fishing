@@ -1,11 +1,11 @@
 <?php
-
 // APIのURLルーティング定義ファイル
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\CatchReportController;
+use App\Http\Controllers\CommentController;
 
 // 認証不要ルート //
 // ユーザー登録(POST /api/register)
@@ -24,8 +24,11 @@ Route::get('/reports', [CatchReportController::class, 'index']);
 // ※ /reports/{id}より前に書かないと"map"がIDとして解釈されるので注意
 Route::get('/reports/map', [CatchReportController::class, 'mapIndex']);
 
-// 釣果詳細(GET /api/reports/N)
+// 釣果詳細(GET /api/reports/{catchReport})
 Route::get('/reports/{catchReport}', [CatchReportController::class, 'show']);
+
+// コメント一覧(GET /api/reports/{catchReport}/comments)
+Route::get('/reports/{catchReport}/comments', [CommentController::class, 'index']);
 
 
 // 認証必要ルート(ログインしてないとアクセス不可) //
@@ -40,6 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 釣果投稿(POST /api/reports)multipart/form-dataで画像も送れる
     Route::post('/reports', [CatchReportController::class, 'store']);
 
-    // 釣果削除(DELETE /api/reports/1)自分の投稿のみ削除可
+    // 釣果削除(DELETE /api/reports/{catchReport})自分の投稿のみ削除可
     Route::delete('/reports/{catchReport}', [CatchReportController::class, 'destroy']);
+
+    // コメント投稿(POST /api/reports/{catchReport}/comments)
+    Route::post('/reports/{catchReport}/comments', [CommentController::class, 'store']);
 });
