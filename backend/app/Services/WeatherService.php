@@ -9,7 +9,7 @@ class WeatherService {
     // 青森県の地域コード(青森県全体の天気予報が取得できる)
     private const FORECAST_CODE = '020000';
 
-    // 天気コードと天気明のマッピング
+    // 天気コードと天気名のマッピング
     // 参考ページ(https://qiita.com/nak435/items/7f3588d3f75beb5890fa)
     // 週間予報APIはテキストではなくコード(100, 201など)で天気を返すため変換が必要
     private const WEATHER_CODES = [
@@ -121,10 +121,10 @@ class WeatherService {
             // 風テキストから風向きを抽出
             $windDir = $this->extractWindDirection($todayWind);
 
-            // 今日の気温(から文字の場合は0)
+            // 今日の気温(空文字の場合は0)
             $temperature = isset($temps[0]) && $temps[0] !== '' ? (float)$temps[0] : null;
 
-            // 短期予報の気温データ(日付ごとに最高・裁定を整理)
+            // 短期予報の気温データ(日付ごとに最高・最低を整理)
             // JMAの短期予報気温は[日付1_時刻A, 日付_1_時刻B, 日付2_時刻A, ...]の順
             $tempTimeDefines = $tempSeries['timeDefines'] ?? [];
             $shortTempByDate = []; // ['YYY-MM-DD' => ['max' => N, 'min' => N]]の形に整理
