@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CatchReport extends Model
 {
+    // テスト用ダミーデータ生成(CatchReportFactoryと連携)
+    use HasFactory;
+
     // 一括代入を許可するカラムのリスト(セキュリティ対策)
     protected $fillable = [
         'user_id',
