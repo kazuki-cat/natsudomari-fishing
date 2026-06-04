@@ -25,7 +25,10 @@ class AuthTest extends TestCase
 
         // 201 Created が返り、user情報とtokenが含まれる
         $response->assertStatus(201)
-            ->assertJsonStructure(['user' => ['id', 'name', 'email'], 'token']);
+            ->assertJsonStructure(['user' => ['id', 'name',], 'token']);
+
+        // emailが漏れていないことを確認
+        $this->assertArrayNotHasKey('email', $response->json('user'));
 
         // DBにユーザーが保存されている
         $this->assertDatabaseHas('users', ['email' => 'taro@example.com']);
@@ -59,7 +62,10 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['user' => ['id', 'name', 'email'], 'token']);
+            ->assertJsonStructure(['user' => ['id', 'name',], 'token']);
+
+        // emailが漏れていないことを確認
+        $this->assertArrayNotHasKey('email', $response->json('user'));
     }
 
     // メールアドレスが存在しないとログインできない

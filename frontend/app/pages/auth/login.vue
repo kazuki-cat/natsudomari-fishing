@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// ログイン中のユーザーはこのページに入れない(トップへ遷移)
+definePageMeta({ middleware: "guest" });
+
 useHead({ title: "ログイン" });
 
 const { login } = useAuth();
@@ -22,8 +25,15 @@ const onSubmit = async () => {
     // POST /api/login → 成功するとuserとtokenが返る
     await login(email.value, password.value);
     router.push("/");
-  } catch {
-    error.value = "メールアドレスまたはパスワードが正しくありません";
+  } catch (e: any) {
+    // 429 = レート制限(throttle:6,1)で弾かれた場合
+    if (e?.response?.status === 429) {
+      error.value =
+        "試行回数が上限を超えました。しばらく待ってから再度お試しください。";
+    } else {
+      // それ以外(認証失敗 422など)のメッセージ
+      error.value = "メールアドレスまたはパスワードが正しくありません";
+    }
   } finally {
     loading.value = false;
   }
