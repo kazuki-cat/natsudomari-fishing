@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Storage;
 
 class CatchReport extends Model
 {
@@ -32,6 +33,10 @@ class CatchReport extends Model
         'longitude' => 'float',
     ];
 
+    // JSONに自動で含める ※DBには無い算出プロパティ
+    // 毎回image_pathから計算して作る
+    protected $appends = ['image_url'];
+
     // CatchReportはUserにBelongsTo(多対一)
     public function user(): BelongsTo
     {
@@ -42,5 +47,16 @@ class CatchReport extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    // image_pathから画像の完全URLを組み立てて返すアクセサ
+    // FILESYSTEM_DISK が local なら http://localhost/storage/... を、
+    // s3 なら S3 のURLを自動で返す(フロントはこれを使うだけ)
+    public function getImageUrlAttribute(): ?string
+    {
+        // ※url()の[Undefined method]警告は誤検知。実際は正常に動く
+        return $this->image_path
+            ? Storage::disk('public')->url($this->image_path)
+            : null;
     }
 }
