@@ -11,7 +11,7 @@ RUN apk add --no-cache \
     unzip \
     oniguruma-dev
 
-# PHP拡張をインストール
+# PHP拡張をインストール(opcacheは拡張を入れるだけ。ON/OFFは.iniで制御)
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
@@ -20,7 +20,8 @@ RUN docker-php-ext-install \
     pcntl \
     bcmath \
     gd \
-    zip
+    zip \
+    opcache
 
 # Composerをインストール
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
