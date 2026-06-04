@@ -9,10 +9,12 @@ use App\Http\Controllers\CommentController;
 
 // 認証不要ルート //
 // ユーザー登録(POST /api/register)
-Route::post('/register', [AuthController::class, 'register']);
+// throttle:6,1 = 1分間に6回まで(1つのIPから)。連打での登録スパム/総当たり対策
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:6,1');
 
 // ログイン(POST /api/login)
-Route::post('/login', [AuthController::class, 'login']);
+// throttle:6,1 = 1分間に6回まで。超えると429を返す(ブルートフォース対策)
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
 // 天気・営業予報(GET / api/weather)
 Route::get('/weather', [WeatherController::class, 'index']);

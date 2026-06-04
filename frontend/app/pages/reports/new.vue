@@ -93,8 +93,6 @@ const onImageChange = (e: Event) => {
 // フォーム送信処理
 // バリデーション → APIで投稿 → タイムラインへリダイレクト
 const onSubmit = async () => {
-  console.log("caught_at:", form.caught_at);
-  console.log("today:", new Date().toLocaleDateString("sv"));
   const errors: string[] = [];
 
   // 各必須項目のバリデーション

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 useHead({ title: "新規登録" });
 
+// ログイン中のユーザーはこのページに入れない(トップへ遷移)
+definePageMeta({ middleware: "guest" });
+
 const { register } = useAuth();
 const router = useRouter();
 
@@ -34,8 +37,14 @@ const onSubmit = async () => {
     );
     router.push("/");
   } catch (e: any) {
-    // エラーメッセージをサーバーのレスポンスから取得、なければデフォルトメッセージ
-    error.value = e?.data?.message || "登録に失敗しました";
+    // 429 = 登録の連打でレート制限に引っかかった場合
+    if (e?.response?.status === 429) {
+      error.value =
+        "試行回数が上限を超えました。しばらく待ってから再度お試しください。";
+    } else {
+      // それ以外はサーバーのエラーメッセージ(無ければ既定文言)
+      error.value = e?.data?.message || "登録に失敗しました";
+    }
   } finally {
     loading.value = false;
   }
