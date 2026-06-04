@@ -10,7 +10,7 @@ import L from "leaflet";
 const props = defineProps<{
   latitude: number; // 釣れた場所の緯度
   longitude: number; // 釣れた場所の経度
-  imagePath?: string | null; // 釣果写真のパス(マップ遷移時に渡す)
+  imageUrl?: string | null; // 釣果写真の完全URL(マップ遷移時に渡す)
 }>();
 
 const router = useRouter();
@@ -23,8 +23,8 @@ const goToMap = () => {
     lat: String(props.latitude),
     lng: String(props.longitude),
   };
-  // 画像がある場合はパスも渡す(マップページでポップアップに表示するため)
-  if (props.imagePath) query.img = props.imagePath;
+  // 画像がある場合は完全URLも渡す(マップページでポップアップに表示するため)
+  if (props.imageUrl) query.img = props.imageUrl;
 
   // 例: /map?lat=4.002&lng=140.883&img=catch_images/xxx.jpgへ遷移
   router.push({ path: "/map", query });

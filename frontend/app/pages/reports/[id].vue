@@ -107,7 +107,7 @@ const submitComment = async () => {
         <!-- 釣果写真(あれば表示、なければダミー画像) -->
         <img
           v-if="report.image_path"
-          :src="`/storage/${report.image_path}`"
+          :src="report.image_url ?? ''"
           :alt="report.fish_name"
           class="w-full rounded-lg mb-4"
         />
@@ -142,7 +142,7 @@ const submitComment = async () => {
             <CatchSpotMap
               :latitude="report.latitude"
               :longitude="report.longitude"
-              :image-path="report.image_path"
+              :image-url="report.image_url"
             />
           </ClientOnly>
         </div>

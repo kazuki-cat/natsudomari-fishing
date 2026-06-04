@@ -31,7 +31,7 @@ const formatDate = (dateStr: string) => {
     <!-- 写真がある場合は表示、ない場合はダミー画像 -->
     <img
       v-if="report.image_path"
-      :src="`/storage/${report.image_path}`"
+      :src="report.image_url ?? ''"
       :alt="report.fish_name"
       class="w-full h-40 object-cover rounded-lg mb-3"
     />

@@ -73,7 +73,7 @@ onMounted(() => {
 
     // ポップアップに表示する画像HTML(画像あり → 実際の画像、 なし → '写真なし'とテキスト表示)
     const imageHtml = report.image_path
-      ? `<img src="/storage/${report.image_path}" style="width:150px;height:90px;object-fit:cover;border-radius:5px;display:block;margin-bottom:5px">`
+      ? `<img src="${report.image_url}" style="width:150px;height:90px;object-fit:cover;border-radius:5px;display:block;margin-bottom:5px">`
       : `<div style="width:150px;height:90px;border-radius:5px;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center;margin-bottom:5px;font-size:14px;color:#0ea5e9;">写真なし</div>`;
 
     // 魚種ごとのアイコン画像
@@ -151,7 +151,7 @@ onMounted(() => {
     // フォーカスピンのポップアップ: 画像がある場合は写真を表示
     const popupContent = props.focusImage
       ? `<div style="text-align:center;">
-          <img src="/storage/${props.focusImage}" style="width:150px;height:90px;object-fit:cover;border-radius:5px;display:block;margin-bottom:4px">
+          <img src="${props.focusImage}" style="width:150px;height:90px;object-fit:cover;border-radius:5px;display:block;margin-bottom:4px">
           <strong>📍 ここで釣れました</strong>
         </div>`
       : "<strong>📍 ここで釣れました</strong>";

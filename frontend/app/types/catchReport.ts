@@ -18,6 +18,7 @@ export interface CatchReport {
   longitude: number; // 経度
   location_name: string;
   image_path: string | null;
+  image_url: string | null; // 画像の完全URL(バックエンドのimage_urlアクセサが返す)
   memo: string | null;
   comments_count: number; // コメント件数
   created_at: string;
