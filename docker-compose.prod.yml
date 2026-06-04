@@ -1,0 +1,44 @@
+# 本番用Docker構成(EC2 + RDS向け)
+# 開発用 docker-compose.ymlとの違い:
+#  - mysqlコンテナを削除(DBはAWS RDSを使う。backend/.envの DB_HOST をRDSに向ける)
+#  - nodeは本番ビルドを起動(npm run build → node .output/server/index.mjs)
+#  - phpはopcacheを有効化(opcache.iniをマウント)
+#  - 開発用のファイル監視(CHOKIDAR_USEPOLLING)は不要なので無し
+#  - restart: unless-stoppedでクラッシュ・再起動時に自動復帰
+# 使い方: docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend:/var/www/backend
+    depends_on:
+      - php
+      - node
+    restart: unless-stopped
+
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./backend:/var/www/backend
+      # 本番用のopcache設定を追加で読み込ませる(開発のenable=0を上書きしてON)
+      - ./docker/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
+    restart: unless-stopped
+
+  node:
+    build:
+      context: ./docker/node
+    volumes:
+      - ./frontend:/app
+      # 本番用の起動スクリプトをマウントして使う(開発用 entrypoint.shは使わない)
+      - ./docker/node/entrypoint.prod.sh:/entrypoint.prod.sh
+    # 開発用ENTRYPOINT(/entrypoint.sh = npm run dev)を本番用で上書き
+    entrypoint: ["/bin/sh", "/entrypoint.prod.sh"]
+    environment:
+      - HOST=0.0.0.0 # コンテナ外からアクセスできるように
+      - PORT=3000 # NuxtのSSRサーバーが待ち受けるポート
+    restart: unless-stopped
