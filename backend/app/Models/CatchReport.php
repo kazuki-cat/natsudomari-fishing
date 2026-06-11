@@ -50,13 +50,13 @@ class CatchReport extends Model
     }
 
     // image_pathから画像の完全URLを組み立てて返すアクセサ
-    // FILESYSTEM_DISK が local なら http://localhost/storage/... を、
-    // s3 なら S3 のURLを自動で返す(フロントはこれを使うだけ)
+    // デフォルトディスク(.envのFILESYSTEM_DISK)のURLを返す
+    // 開発=public(http://.../storage/...)、本番=s3(S3のURL)。フロントはこれを使うだけ
     public function getImageUrlAttribute(): ?string
     {
         // ※url()の[Undefined method]警告は誤検知。実際は正常に動く
         return $this->image_path
-            ? Storage::disk('public')->url($this->image_path)
+            ? Storage::url($this->image_path)
             : null;
     }
 }
