@@ -6,6 +6,7 @@ use App\Models\CatchReport;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // デモ画像をstorage/app/public/catch_images/ へコピー
+        // デモ画像をデフォルトディスク(.envのFILESYSTEM_DISK)のcatch_imagesへコピー
+        // 開発=public(ローカル)、本番=s3。Storage経由なのでS3でもアップされる
         $sourceDir = database_path('seeders/images'); // コピー元(リポジトリ内)
-        $targetDir = storage_path('app/public/catch_images'); // コピー先(配置される場所)
-        File::ensureDirectoryExists($targetDir); // 無ければフォルダを作成
         foreach (File::files($sourceDir) as $image) {
-            File::copy($image->getPathname(), $targetDir . '/' . $image->getFilename());
+            Storage::putFileAs('catch_images', $image->getPathname(), $image->getFilename());
         }
 
         // デモのユーザーと釣果を投入

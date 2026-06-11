@@ -73,9 +73,9 @@ class CatchReportController extends Controller
         // 画像ファイルが送られてきた場合はストレージに保存
         $imagePath = null;
         if ($request->hasFile('image')) {
-            // storage/app/public/catch_image/に保存し、パスを返す
-            // 'public'ディスク = Laravelのpublicストレージ(外部公開可能)
-            $imagePath = $request->file('image')->store('catch_images', 'public');
+            // デフォルトディスク(.envのFILESYSTEM_DISK)のcatch_imagesフォルダに保存しパスを返す
+            // 開発=public(storage/app/public→/storageで配信)、本番=s3(S3に保存)
+            $imagePath = $request->file('image')->store('catch_images');
         }
 
         // DBに保存(Auth:id()でログイン中のユーザーIDを取得)
@@ -107,9 +107,9 @@ class CatchReportController extends Controller
             return response()->json(['message' => '権限がありません'], 403);
         }
 
-        // 画像ファイルが存在する場合は一緒に削除
+        // 画像ファイルが存在する場合は一緒に削除(デフォルトディスクから)
         if ($catchReport->image_path) {
-            Storage::disk('public')->delete($catchReport->image_path);
+            Storage::delete($catchReport->image_path);
         }
 
         // DBからレコードを削除
