@@ -257,6 +257,9 @@ onMounted(async () => {
           ← 釣果タイムラインで見る
         </NuxtLink>
       </div>
+
+      <!-- 未ログイン時のログイン誘導CTA -->
+      <LoginCta />
     </template>
   </div>
 </template>

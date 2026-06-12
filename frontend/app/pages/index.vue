@@ -131,6 +131,39 @@ onMounted(fetchWeather);
         <p>※ 実際の海況は出航当日に必ず確認ください。</p>
         <p>※ 2日以降の風速は気象庁から提供されないため「-」と表示されます。</p>
       </div>
+
+      <!-- 釣果タイムライン・釣り場マップへの回遊動線 -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-sea-700 mb-4">
+          釣果もチェックしてみよう
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- 釣果タイムラインへ -->
+          <NuxtLink
+            to="/reports"
+            class="group block bg-sea-50 hover:bg-sea-100 rounded-lg p-4 transition"
+          >
+            <p class="font-bold text-sea-600 group-hover:text-sea-800">
+              釣果タイムライン
+            </p>
+            <p class="text-sm text-gray-500 group-hover:text-gray-700 mt-1">
+              みんなの最新の釣果をチェック →
+            </p>
+          </NuxtLink>
+          <!-- 釣り場マップへ -->
+          <NuxtLink
+            to="/map"
+            class="group block bg-sea-50 hover:bg-sea-100 rounded-lg p-4 transition"
+          >
+            <p class="font-bold text-sea-600 group-hover:text-sea-800">
+              釣り場マップ
+            </p>
+            <p class="text-sm text-gray-500 group-hover:text-gray-700 mt-1">
+              どこで何が釣れたか地図で見る →
+            </p>
+          </NuxtLink>
+        </div>
+      </div>
     </template>
   </div>
 </template>
