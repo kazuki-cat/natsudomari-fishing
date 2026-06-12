@@ -13,8 +13,12 @@ services:
       context: ./docker/nginx
     ports:
       - "80:80"
+      - "443:443" # HTTPSポートを公開
     volumes:
       - ./backend:/var/www/backend
+      - ./docker/nginx/default.prod.conf:/etc/nginx/conf.d/default.conf:ro # default.confを上書き
+      - /etc/letsencrypt:/etc/letsencrypt:ro # EC2ホストのLet's Encrypt証明書をnginxから読めるようにする
+      - /var/www/certbot:/var/www/certbot:ro # 証明書更新用のチャレンジ置き場
     depends_on:
       - php
       - node
