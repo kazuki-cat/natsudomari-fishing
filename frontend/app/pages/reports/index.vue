@@ -9,6 +9,8 @@ const { reports, loading, currentPage, lastPage, fetchReports } =
   useCatchReports();
 const { isLoggedIn } = useAuth();
 const error = ref(false);
+// 初回読み込み完了フラグ(CTAのチラつき防止)
+const loaded = ref(false);
 
 // フィルター・ソートの状態
 const sort = ref<"newest" | "oldest">("newest");
@@ -86,9 +88,13 @@ const applyFilters = () => {
     fish_name: filterFish.value,
     tackle: filterTackle.value,
     location_name: filterLocation.value,
-  }).catch(() => {
-    error.value = true;
-  });
+  })
+    .catch(() => {
+      error.value = true;
+    })
+    .finally(() => {
+      loaded.value = true; // 初回読み込み完了
+    });
 };
 
 // フィルターリセット
@@ -266,5 +272,8 @@ onMounted(applyFilters);
         {{ page }}
       </button>
     </div>
+
+    <!-- 未ログイン時のログイン誘導CTA -->
+    <LoginCta v-if="loaded && !loading" />
   </div>
 </template>
