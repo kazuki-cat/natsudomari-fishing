@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリのコードを取得
+        uses: actions/checkout@v4
+
+      - name: PHPをセットアップ
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath
+
+      - name: Composerで依存をインストール
+        working-directory: backend
+        run: composer install --prefer-dist --no-progress
+
+      - name: .envとアプリキーを準備
+        working-directory: backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      
+      - name: テストを実行
+        working-directory: backend
+        run: php artisan test
+
+      - name: コード整形チェック(Pint)
+        working-directory: backend
+        run: ./vendor/bin/pint --test
