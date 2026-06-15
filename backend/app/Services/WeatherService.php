@@ -141,12 +141,29 @@ class WeatherService {
                 }
             }
 
+            // 短期予報の降水確率(6時間ごと)を日付ごとに集計(その日の最大%を採用)
+            // 週間予報の先頭の近い日はpopが空のことがあるので、ここで埋める目的
+            $popSeries = $shortTerm[1] ?? []; // 短期予報の降水確率シリーズ
+            $shortPops = $popSeries['areas'][0]['pops'] ?? [];
+            $popTimeDefines = $popSeries['timeDefines'] ?? [];
+            $shortPopByDate = []; // ['YYYY-MM-DD' => 最大pop] 
+            foreach ($popTimeDefines as $i => $popDate) {
+                $val = $shortPops[$i] ?? '';
+                if ($val === '') continue;
+                $dateKey = (new \DateTime($popDate))->format('Y-m-d');
+                $pop = (int)$val;
+                if (!isset($shortPopByDate[$dateKey]) || $pop > $shortPopByDate[$dateKey]) {
+                    $shortPopByDate[$dateKey] = $pop;
+                }
+            }
+
             // 週間予報の配列を組み立て(7日分)
             $forecast = $this->buildWeeklyForecast(
                 $weeklyDates, $weeklyWeatherCodes, $weeklyPops,
                 $weeklyTempsMax, $weeklyTempsMin,
                 $winds, $shortDates,
                 $shortTempByDate,
+                $shortPopByDate,
             );
 
             // フロントエンドに返すデータ構造
@@ -168,14 +185,15 @@ class WeatherService {
 
     // 週間予報の配列を組み立てるプライベートメソッド
     private function buildWeeklyForecast(
-        array $weeklyDates,     // 週間予報の日時配列(7日分)
-        array $codes,           // 天気コード
-        array $pops,            // 降水確率
-        array $tempsMax,        // 最高気温(週間)
-        array $tempsMin,        // 最低気温(週間)
-        array $shortWinds,      // 短期予報の風テキスト(今日・明日の風速測定に使用)
-        array $shortDates,      // 短期予報の日時
-        array $shortTempByDate  // 短期予報の日付→気温マップ ['YYYY-MM-DD' => ['max'=>N, 'min'=>N]]
+        array $weeklyDates,      // 週間予報の日時配列(7日分)
+        array $codes,            // 天気コード
+        array $pops,             // 降水確率
+        array $tempsMax,         // 最高気温(週間)
+        array $tempsMin,         // 最低気温(週間)
+        array $shortWinds,       // 短期予報の風テキスト(今日・明日の風速測定に使用)
+        array $shortDates,       // 短期予報の日時
+        array $shortTempByDate,  // 短期予報の日付→気温マップ ['YYYY-MM-DD' => ['max'=>N, 'min'=>N]]
+        array $shortPopByDate    // 短期予報の日付→降水確率マップ ['YYYY-MM-DD' => 最大N%]
     ): array {
         // 曜日の配列(0=日, 1=月, ...)
         $days = ['日', '月', '火', '水', '木', '金', '土'];
@@ -210,7 +228,8 @@ class WeatherService {
                 'weatherDescription' => $description,   // 天気名(例： 曇、晴時々曇)
                 'weatherCode'        => $code,          // 気象庁の天気コード(例: 200)
                 'windSpeed'          => $windSpeed,     // 推定風速(m/s)短期予報から取得
-                'pop'                => $pops[$i] !== '' ? (int)$pops[$i] : null, // 降水確率(%) 空文字はnull
+                // 降水確率(週間が空なら短期予報で補完)
+                'pop'                => $pops[$i] !== '' ? (int)$pops[$i] : ($shortPopByDate[$dateKey] ?? null),
                 'temperatureMax'     => $maxTemp,       // 最高気温 空文字はnullで短期予報で補完
                 'temperatureMin'     => $minTemp,       // 最低気温 空文字はnullで短期予報で補完
             ];
