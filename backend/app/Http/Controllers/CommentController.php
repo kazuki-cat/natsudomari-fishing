@@ -1,4 +1,5 @@
 <?php
+
 // 釣果投稿へのコメントを担当するコントローラー
 
 namespace App\Http\Controllers;
@@ -15,6 +16,7 @@ class CommentController extends Controller
     {
         // 指定した釣果投稿に紐づくコメントを、ユーザー情報付きで取得
         $comments = $catchReport->comments()->with('user')->latest()->get();
+
         return response()->json(['data' => $comments]);
     }
 
@@ -23,7 +25,7 @@ class CommentController extends Controller
     {
         // バリデーション
         $validated = $request->validate([
-            'body' => 'required|string|max:300' // 必須・300文字以内
+            'body' => 'required|string|max:300', // 必須・300文字以内
         ]);
 
         // コメントをDBに保存

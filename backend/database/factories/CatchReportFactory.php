@@ -2,13 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\CatchReport;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * テスト用の釣果投稿ダミーデータを生成するファクトリ
  *
- * @extends Factory<\App\Models\CatchReport>
+ * @extends Factory<CatchReport>
  */
 class CatchReportFactory extends Factory
 {
@@ -62,7 +63,7 @@ class CatchReportFactory extends Factory
             'ヒラメ' => ['泳がせ釣り', 'イソメ釣り', 'ロックフィッシュ', 'ショアジギング', 'その他'],
             'カレイ' => ['泳がせ釣り', 'イソメ釣り', 'ロックフィッシュ', 'ショアジギング', 'その他'],
             'マダイ' => ['泳がせ釣り', 'イソメ釣り', 'ショアジギング', 'タイラバゲーム', 'その他'],
-            'アジ' => ['サビキ釣り', 'フカセ釣り','ショアジギング', 'アジング', 'その他'],
+            'アジ' => ['サビキ釣り', 'フカセ釣り', 'ショアジギング', 'アジング', 'その他'],
             'サバ' => ['サビキ釣り', 'フカセ釣り', 'ショアジギング', 'その他'],
             'イワシ' => ['サビキ釣り', 'フカセ釣り', 'その他'],
             'イナダ' => ['泳がせ釣り', 'フカセ釣り', 'ショアジギング', 'その他'],
@@ -73,7 +74,7 @@ class CatchReportFactory extends Factory
             'マグロ' => ['泳がせ釣り', 'フカセ釣り', 'ショアジギング', 'その他'],
             'シーバス' => ['泳がせ釣り', 'フカセ釣り', 'ショアジギング', 'その他'],
             'ヤリイカ' => ['エギング', 'その他'],
-            'クロダイ' => ['泳がせ釣り', 'イソメ釣り', 'ショアジギング','タイラバゲーム', 'その他'],
+            'クロダイ' => ['泳がせ釣り', 'イソメ釣り', 'ショアジギング', 'タイラバゲーム', 'その他'],
             'マゴチ' => ['泳がせ釣り', 'イソメ釣り', 'ロックフィッシュ', 'ショアジギング', 'その他'],
             'タコ' => ['その他'],
             'その他' => ['サビキ釣り', '泳がせ釣り', 'イソメ釣り', 'フカセ釣り', 'ショアジギング', 'その他'],
@@ -112,7 +113,7 @@ class CatchReportFactory extends Factory
             'longitude' => $spot['lng'] + fake()->randomFloat(5, -0.0015, 0.0015),
             'location_name' => $spot['name'],
             // 50%の確率で画像あり(あるなら魚に対応した画像)
-            'image_path' => fake()->boolean(50) ? 'catch_images/' . $fishImages[$fish] . '.jpg' : null,
+            'image_path' => fake()->boolean(50) ? 'catch_images/'.$fishImages[$fish].'.jpg' : null,
             // 50%の確率でメモあり
             'memo' => fake()->boolean(50) ? fake()->randomElement($memos) : null,
         ];

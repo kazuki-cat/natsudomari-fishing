@@ -60,14 +60,14 @@ class CatchReportController extends Controller
     {
         // バリデーション
         $validated = $request->validate([
-            'caught_at'     => 'required|date|before_or_equal:today', // 必須・日付形式・今日以前
-            'fish_name'     => 'required|string|max:100',             // 必須・100文字以内
-            'tackle'        => 'required|string|max:100',             // 必須・100文字以内
-            'latitude'      => 'nullable|numeric|between:-90,90',     // 任意・数値・緯度の範囲内
-            'longitude'     => 'nullable|numeric|between:-180,180',   // 任意・数値・経度の範囲内
+            'caught_at' => 'required|date|before_or_equal:today', // 必須・日付形式・今日以前
+            'fish_name' => 'required|string|max:100',             // 必須・100文字以内
+            'tackle' => 'required|string|max:100',             // 必須・100文字以内
+            'latitude' => 'nullable|numeric|between:-90,90',     // 任意・数値・緯度の範囲内
+            'longitude' => 'nullable|numeric|between:-180,180',   // 任意・数値・経度の範囲内
             'location_name' => 'required|string|max:100',             // 必須・100文字以内
-            'memo'          => 'nullable|string|max:1000',            // 必須・1000文字以内
-            'image'         => 'nullable|image|max:10240'             // 任意・画像ファイル・10MB以内
+            'memo' => 'nullable|string|max:1000',            // 必須・1000文字以内
+            'image' => 'nullable|image|max:10240',             // 任意・画像ファイル・10MB以内
         ]);
 
         // 画像ファイルが送られてきた場合はストレージに保存

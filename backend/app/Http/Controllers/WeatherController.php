@@ -14,7 +14,8 @@ class WeatherController extends Controller
     public function __construct(private WeatherService $weatherService) {}
 
     // 天気・営業予報取得 GET /api/weather
-    public function index(): JsonResponse {
+    public function index(): JsonResponse
+    {
         // WeatherServiceに処理を委託して結果をJSONで返す
         return response()->json($this->weatherService->getCurrentWeather());
     }

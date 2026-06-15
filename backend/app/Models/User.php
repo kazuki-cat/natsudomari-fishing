@@ -4,7 +4,6 @@ namespace App\Models;
 
 // メール認証を必須にしたい場合はこのコメントを外す
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,7 +35,7 @@ class User extends Authenticatable
         'email',
     ];
 
-   // カラムの型キャスト設定
+    // カラムの型キャスト設定
     protected function casts(): array
     {
         return [
