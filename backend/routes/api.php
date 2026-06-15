@@ -1,11 +1,12 @@
 <?php
+
 // APIのURLルーティング定義ファイル
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\CatchReportController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\WeatherController;
+use Illuminate\Support\Facades\Route;
 
 // 認証不要ルート //
 // ユーザー登録(POST /api/register)
@@ -31,7 +32,6 @@ Route::get('/reports/{catchReport}', [CatchReportController::class, 'show']);
 
 // コメント一覧(GET /api/reports/{catchReport}/comments)
 Route::get('/reports/{catchReport}/comments', [CommentController::class, 'index']);
-
 
 // 認証必要ルート(ログインしてないとアクセス不可) //
 Route::middleware('auth:sanctum')->group(function () {

@@ -23,8 +23,8 @@ class WeatherServiceTest extends TestCase
                         'timeDefines' => ['2026-06-15T00:00:00+09:00'],
                         'areas' => [[
                             'weathers' => ['晴れ'],
-                            'winds'    => ['南の風'],
-                            'waves'    => ['0.5メートル'],
+                            'winds' => ['南の風'],
+                            'waves' => ['0.5メートル'],
                         ]],
                     ],
                     // [1] 降水確率(6時間ごと) → 6/15の4スロットで最大は40
@@ -90,7 +90,7 @@ class WeatherServiceTest extends TestCase
         // 気象庁APIを偽の固定データに差し替える
         $this->fakeJmaResponse();
 
-        $weather = (new WeatherService())->getCurrentWeather();
+        $weather = (new WeatherService)->getCurrentWeather();
 
         // forecast[0] = 6/15(週間popは空) → 短期の最大40で埋まるはず(修正前はnull = "-" だった)
         $this->assertNotNull($weather['forecast'][0]['pop']);
@@ -103,7 +103,7 @@ class WeatherServiceTest extends TestCase
         // 気象庁APIを偽の固定データに差し替える
         $this->fakeJmaResponse();
 
-        $weather = (new WeatherService())->getCurrentWeather();
+        $weather = (new WeatherService)->getCurrentWeather();
 
         // forecast[1] = 6/16(週間pop=30) → 30のまま
         $this->assertSame(30, $weather['forecast'][1]['pop']);

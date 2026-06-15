@@ -5,7 +5,8 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 
 // 気象庁の無料APIから天気データを取得・成形するサービスクラス(APIキー不要・完全無料)
-class WeatherService {
+class WeatherService
+{
     // 青森県の地域コード(青森県全体の天気予報が取得できる)
     private const FORECAST_CODE = '020000';
 
@@ -38,7 +39,7 @@ class WeatherService {
         '221' => '曇朝の内一時雨',      '222' => '曇夕方一時雨',          '223' => '曇日中時々晴',
         '224' => '曇昼頃から雨',        '225' => '曇夕方から雨',          '226' => '曇夜は雨',
         '228' => '曇昼頃から雪',        '229' => '曇夕方から雪',          '230' => '曇夜は雪',
-        '231' => '曇海上海岸は霧か霧雨','240' => '曇時々雨で雷を伴う',    '250' => '曇時々雪で雷を伴う',
+        '231' => '曇海上海岸は霧か霧雨', '240' => '曇時々雨で雷を伴う',    '250' => '曇時々雪で雷を伴う',
         '260' => '曇一時雪か雨',        '270' => '曇時々雪か雨',          '281' => '曇後雪か雨',
 
         // 300番台:雨系
@@ -70,10 +71,10 @@ class WeatherService {
         try {
             // 気象庁APIにGETリクエスト(タイムアウト10秒)
             $response = Http::timeout(10)
-                ->get("https://www.jma.go.jp/bosai/forecast/data/forecast/" . self::FORECAST_CODE . ".json");
+                ->get('https://www.jma.go.jp/bosai/forecast/data/forecast/'.self::FORECAST_CODE.'.json');
 
             // APIが失敗したらフォールバック（ダミーデータ)を返す
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return $this->fallback();
             }
 
@@ -108,7 +109,6 @@ class WeatherService {
             $weeklyTempsMax = $weeklyTempSeries['areas'][0]['tempsMax'] ?? []; // 最高気温
             $weeklyTempsMin = $weeklyTempSeries['areas'][0]['tempsMin'] ?? []; // 最低気温
 
-
             // 今日の天気テキストを簡略化(「晴れ後曇一時雨) → 「雨」など ※悪い天気を優先
             $todayWeather = $this->simplifyWeather($weathers[0] ?? '');
 
@@ -122,7 +122,7 @@ class WeatherService {
             $windDir = $this->extractWindDirection($todayWind);
 
             // 今日の気温(空文字の場合は0)
-            $temperature = isset($temps[0]) && $temps[0] !== '' ? (float)$temps[0] : null;
+            $temperature = isset($temps[0]) && $temps[0] !== '' ? (float) $temps[0] : null;
 
             // 短期予報の気温データ(日付ごとに最高・最低を整理)
             // JMAの短期予報気温は[日付1_時刻A, 日付_1_時刻B, 日付2_時刻A, ...]の順
@@ -130,14 +130,16 @@ class WeatherService {
             $shortTempByDate = []; // ['YYY-MM-DD' => ['max' => N, 'min' => N]]の形に整理
             foreach ($tempTimeDefines as $i => $tempDate) {
                 $val = $temps[$i] ?? '';
-                if ($val === '') continue;
+                if ($val === '') {
+                    continue;
+                }
                 $dateKey = (new \DateTime($tempDate))->format('Y-m-d');
-                $hour = (int)(new \DateTime($tempDate))->format('H');
+                $hour = (int) (new \DateTime($tempDate))->format('H');
                 // 6時以降 → 日中気温(最高)として扱う、未満 → (最低)
                 if ($hour >= 6) {
-                    $shortTempByDate[$dateKey]['max'] = (int)$val;
+                    $shortTempByDate[$dateKey]['max'] = (int) $val;
                 } else {
-                    $shortTempByDate[$dateKey]['min'] = (int)$val;
+                    $shortTempByDate[$dateKey]['min'] = (int) $val;
                 }
             }
 
@@ -146,13 +148,15 @@ class WeatherService {
             $popSeries = $shortTerm[1] ?? []; // 短期予報の降水確率シリーズ
             $shortPops = $popSeries['areas'][0]['pops'] ?? [];
             $popTimeDefines = $popSeries['timeDefines'] ?? [];
-            $shortPopByDate = []; // ['YYYY-MM-DD' => 最大pop] 
+            $shortPopByDate = []; // ['YYYY-MM-DD' => 最大pop]
             foreach ($popTimeDefines as $i => $popDate) {
                 $val = $shortPops[$i] ?? '';
-                if ($val === '') continue;
+                if ($val === '') {
+                    continue;
+                }
                 $dateKey = (new \DateTime($popDate))->format('Y-m-d');
-                $pop = (int)$val;
-                if (!isset($shortPopByDate[$dateKey]) || $pop > $shortPopByDate[$dateKey]) {
+                $pop = (int) $val;
+                if (! isset($shortPopByDate[$dateKey]) || $pop > $shortPopByDate[$dateKey]) {
                     $shortPopByDate[$dateKey] = $pop;
                 }
             }
@@ -168,14 +172,14 @@ class WeatherService {
 
             // フロントエンドに返すデータ構造
             return [
-                'temperature'        => $temperature,     // 現在の気温
-                'windSpeed'          => $windSpeed,       // 現在の風速(m/s) ※推定値
-                'windDirection'      => $windDir,         // 現在の風向き(例: 東)
+                'temperature' => $temperature,     // 現在の気温
+                'windSpeed' => $windSpeed,       // 現在の風速(m/s) ※推定値
+                'windDirection' => $windDir,         // 現在の風向き(例: 東)
                 'weatherDescription' => $todayWeather,    // 今日の天気(例: 曇)
-                'waveHeight'         => $todayWave,       // 波高テキスト(例: "1メートル　後　1.5メートル")
-                'waveHeightValue'    => $waveHeightValue, // 波高数値(営業判定用)
-                'windText'           => $todayWind,       // 元の風テキスト(デバッグ用)
-                'forecast'           => $forecast,        // 7日分の週間予報配列
+                'waveHeight' => $todayWave,       // 波高テキスト(例: "1メートル　後　1.5メートル")
+                'waveHeightValue' => $waveHeightValue, // 波高数値(営業判定用)
+                'windText' => $todayWind,       // 元の風テキスト(デバッグ用)
+                'forecast' => $forecast,        // 7日分の週間予報配列
             ];
         } catch (\Exception) {
             // 例外が発生した場合もフォールバックを返す
@@ -202,7 +206,7 @@ class WeatherService {
         foreach ($weeklyDates as $i => $timeDefine) {
             $date = new \DateTime($timeDefine);
             // 表示用の日付文字列(例: 05/11（月）)
-            $label = $date->format('m/d') . '（' . $days[(int)$date->format('w')] . '）';
+            $label = $date->format('m/d').'（'.$days[(int) $date->format('w')].'）';
 
             // 天気コードを天気名に変換(マッピングにない場合は'不明')
             $code = $codes[$i] ?? null;
@@ -220,20 +224,21 @@ class WeatherService {
 
             // 週間予報に気温が含まれない日(最初の1〜2日)は短期予報の値で補完する
             $dateKey = $date->format('Y-m-d');
-            $maxTemp = $tempsMax[$i] !== '' ? (int)$tempsMax[$i] : ($shortTempByDate[$dateKey]['max'] ?? null);
-            $minTemp = $tempsMin[$i] !== '' ? (int)$tempsMin[$i] : ($shortTempByDate[$dateKey]['min'] ?? null);
+            $maxTemp = $tempsMax[$i] !== '' ? (int) $tempsMax[$i] : ($shortTempByDate[$dateKey]['max'] ?? null);
+            $minTemp = $tempsMin[$i] !== '' ? (int) $tempsMin[$i] : ($shortTempByDate[$dateKey]['min'] ?? null);
 
             $forecast[] = [
-                'date'               => $label,         // 表示用日付(例: 05/22（金))
+                'date' => $label,         // 表示用日付(例: 05/22（金))
                 'weatherDescription' => $description,   // 天気名(例： 曇、晴時々曇)
-                'weatherCode'        => $code,          // 気象庁の天気コード(例: 200)
-                'windSpeed'          => $windSpeed,     // 推定風速(m/s)短期予報から取得
+                'weatherCode' => $code,          // 気象庁の天気コード(例: 200)
+                'windSpeed' => $windSpeed,     // 推定風速(m/s)短期予報から取得
                 // 降水確率(週間が空なら短期予報で補完)
-                'pop'                => $pops[$i] !== '' ? (int)$pops[$i] : ($shortPopByDate[$dateKey] ?? null),
-                'temperatureMax'     => $maxTemp,       // 最高気温 空文字はnullで短期予報で補完
-                'temperatureMin'     => $minTemp,       // 最低気温 空文字はnullで短期予報で補完
+                'pop' => $pops[$i] !== '' ? (int) $pops[$i] : ($shortPopByDate[$dateKey] ?? null),
+                'temperatureMax' => $maxTemp,       // 最高気温 空文字はnullで短期予報で補完
+                'temperatureMin' => $minTemp,       // 最低気温 空文字はnullで短期予報で補完
             ];
         }
+
         return $forecast;
     }
 
@@ -241,22 +246,36 @@ class WeatherService {
     // 全角数字を半角に変換して最大値を返す(「1メートル　後　1.5メートル」→ 1.5)
     private function parseWaveHeight(string $waveText): ?float
     {
-        if ($waveText === '') return null; // 波高テキストがない場合はnull
-        $text = mb_convert_kana($waveText, 'n'); //全角数字→半角に変換
+        if ($waveText === '') {
+            return null;
+        } // 波高テキストがない場合はnull
+        $text = mb_convert_kana($waveText, 'n'); // 全角数字→半角に変換
         $text = str_replace('．', '.', $text); // 全角小数点→半角(mb_convert_kanaでは変換されないため)
         preg_match_all('/\d+\.?\d*/', $text, $matches);
-        if (empty($matches[0])) return null;
-        return (float)max($matches[0]);
+        if (empty($matches[0])) {
+            return null;
+        }
+
+        return (float) max($matches[0]);
     }
 
     // 風テキストから風速(m/s)を推定するプライベートメソッド
     // 気象庁の風テキストには「やや強く」「強く」などの表現が含まれる
     private function estimateWindSpeed(string $windText): float
     {
-        if (str_contains($windText, '暴風') || str_contains($windText, '非常に強く')) return 15.0;
-        if (str_contains($windText, '強く')) return 8.0;
-        if (str_contains($windText, 'やや強く')) return 5.0;
-        if (str_contains($windText, '穏やか') || str_contains($windText, '弱く')) return 1.5;
+        if (str_contains($windText, '暴風') || str_contains($windText, '非常に強く')) {
+            return 15.0;
+        }
+        if (str_contains($windText, '強く')) {
+            return 8.0;
+        }
+        if (str_contains($windText, 'やや強く')) {
+            return 5.0;
+        }
+        if (str_contains($windText, '穏やか') || str_contains($windText, '弱く')) {
+            return 1.5;
+        }
+
         return 3.0; // デフォルト(記載なし＝普通の風)
     }
 
@@ -266,8 +285,11 @@ class WeatherService {
     {
         // 16方位を長いものから順にチェック(「北北東」が「北」より先にマッチするように)
         foreach (['北北東', '北北西', '南南東', '南南西', '北東', '北西', '南東', '南西', '北', '南', '東', '西'] as $dir) {
-            if (str_contains($windText, $dir)) return $dir;
+            if (str_contains($windText, $dir)) {
+                return $dir;
+            }
         }
+
         return '不明';
     }
 
@@ -278,10 +300,19 @@ class WeatherService {
         // 全角スペースや半角スペースを除去
         $weather = preg_replace('/[\x{3000}\s]+/u', '', $weather);
         // 優先度: 雪 > 雨 > 曇り > 晴れ(悪い天気を優先表示)
-        if (str_contains($weather, '雪')) return '雪';
-        if (str_contains($weather, '雨')) return '雨';
-        if (str_contains($weather, '曇')) return '曇り';
-        if (str_contains($weather, '晴')) return '晴れ';
+        if (str_contains($weather, '雪')) {
+            return '雪';
+        }
+        if (str_contains($weather, '雨')) {
+            return '雨';
+        }
+        if (str_contains($weather, '曇')) {
+            return '曇り';
+        }
+        if (str_contains($weather, '晴')) {
+            return '晴れ';
+        }
+
         return $weather ?: '不明';
     }
 
@@ -289,14 +320,14 @@ class WeatherService {
     private function fallback(): array
     {
         return [
-            'temperature'        => null,
-            'windSpeed'          => null,
-            'windDirection'      => '不明',
+            'temperature' => null,
+            'windSpeed' => null,
+            'windDirection' => '不明',
             'weatherDescription' => '取得失敗',
-            'waveHeight'         => '',
-            'waveHeightValue'    => null,
-            'windText'           => '',
-            'forecast'           => [],
+            'waveHeight' => '',
+            'waveHeightValue' => null,
+            'windText' => '',
+            'forecast' => [],
         ];
     }
 }
