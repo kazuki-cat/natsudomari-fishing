@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # バックエンド(Laravel/PHP)の依存を監視
+  - package-ecosystem: "composer"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # フロントエンド(Nuxt/JS)の依存を監視
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # GitHub Actions(ci.yml/deploy.ymlで使うAction)の更新を監視
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
