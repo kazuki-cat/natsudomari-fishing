@@ -1,0 +1,23 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2へSSH接続して本番へ反映
+        uses: appleboy/ssh-action@v1
+        with:
+          # 接続先はSecretsから参照(ymlに値は書かない)
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # EC2上で実行するコマンド
+          script: |
+            cd ~/natsudomari-fishing
+            git pull origin main
+            docker compose -f docker-compose.prod.yml exec -T php php artisan config:cache
+            docker compose -f docker-compose.prod.yml restart php
