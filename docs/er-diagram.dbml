@@ -1,0 +1,50 @@
+// 夏泊釣り情報サービス ER図
+
+Table users {
+  id bigint [pk, increment]
+  name varchar
+  email varchar [unique, not null]
+  email_verified_at timestamp [null]
+  password varchar
+  remember_token varchar [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table catch_reports {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id, not null] // 投稿者
+  caught_at date [not null]                  // 釣れた日
+  fish_name varchar [not null]               // 魚種
+  tackle varchar [not null]                  // 仕掛け
+  latitude decimal(10,7) [null]               // 緯度
+  longitude decimal(10,7) [null]             // 経度
+  location_name varchar [not null]           // 釣り場名
+  image_path varchar [null]                  // 画像パス(S3)
+  memo text [null]                           // メモ
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table comments {
+  id bigint [pk, increment]
+  catch_report_id bigint [ref: > catch_reports.id, not null] // 対象の釣果
+  user_id bigint [ref: > users.id, not null]                 // コメント投稿者
+  body text [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Sanctum標準のトークン認証テーブル
+Table personal_access_tokens {
+  id bigint [pk, increment]
+  tokenable_type varchar [not null]
+  tokenable_id bigint [not null]
+  name text [not null]
+  token varchar(64) [unique, not null]
+  abilities text [null]
+  last_used_at timestamp [null]
+  expires_at timestamp [null]
+  created_at timestamp
+  updated_at timestamp
+}
