@@ -242,9 +242,9 @@ class WeatherService
         return $forecast;
     }
 
-    // 波高テキストから数値(m)を抽出するプライベートメソッド
+    // 波高テキストから数値(m)を抽出するメソッド
     // 全角数字を半角に変換して最大値を返す(「1メートル　後　1.5メートル」→ 1.5)
-    private function parseWaveHeight(string $waveText): ?float
+    public function parseWaveHeight(string $waveText): ?float
     {
         if ($waveText === '') {
             return null;
@@ -259,18 +259,18 @@ class WeatherService
         return (float) max($matches[0]);
     }
 
-    // 風テキストから風速(m/s)を推定するプライベートメソッド
-    // 気象庁の風テキストには「やや強く」「強く」などの表現が含まれる
-    private function estimateWindSpeed(string $windText): float
+    // 風テキストから風速(m/s)を推定するメソッド
+    // ※「やや強く」は「強く」を部分文字列に含めるため、必ず「やや強く」を先に判定する
+    public function estimateWindSpeed(string $windText): float
     {
         if (str_contains($windText, '暴風') || str_contains($windText, '非常に強く')) {
             return 15.0;
         }
-        if (str_contains($windText, '強く')) {
-            return 8.0;
-        }
         if (str_contains($windText, 'やや強く')) {
             return 5.0;
+        }
+        if (str_contains($windText, '強く')) {
+            return 8.0;
         }
         if (str_contains($windText, '穏やか') || str_contains($windText, '弱く')) {
             return 1.5;
@@ -279,9 +279,9 @@ class WeatherService
         return 3.0; // デフォルト(記載なし＝普通の風)
     }
 
-    // 風テキストから風向きを抽出するプライベートメソッド
+    // 風テキストから風向きを抽出するメソッド
     // 「南の風やや強く」 → 「南」
-    private function extractWindDirection(string $windText): string
+    public function extractWindDirection(string $windText): string
     {
         // 16方位を長いものから順にチェック(「北北東」が「北」より先にマッチするように)
         foreach (['北北東', '北北西', '南南東', '南南西', '北東', '北西', '南東', '南西', '北', '南', '東', '西'] as $dir) {
@@ -293,9 +293,9 @@ class WeatherService
         return '不明';
     }
 
-    // 天気テキストを簡略化するプライベートメソッド
+    // 天気テキストを簡略化するメソッド
     // 「晴れ後一時雨か雪」 → 「雪」(悪い天気状態を優先)
-    private function simplifyWeather(string $weather): string
+    public function simplifyWeather(string $weather): string
     {
         // 全角スペースや半角スペースを除去
         $weather = preg_replace('/[\x{3000}\s]+/u', '', $weather);

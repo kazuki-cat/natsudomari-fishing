@@ -36,6 +36,24 @@ export default defineNuxtConfig({
           content:
             "夏泊半島周辺のボートレンタル営業予報と釣果情報を共有するサービス",
         },
+        // OGP(SNS共有時のカード表示用)
+        { property: "og:title", content: "夏泊釣り情報" },
+        {
+          property: "og:description",
+          content:
+            "夏泊半島のボートレンタル営業予報と釣果情報を共有するサービス",
+        },
+        { property: "og:type", content: "website" },
+        {
+          property: "og:url",
+          content: "https://natsudomari-fishing.duckdns.org",
+        },
+        {
+          property: "og:image",
+          content: "https://natsudomari-fishing.duckdns.org/ogp.png",
+        },
+        // Twitter/Xでリンクを貼ったときの設定
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       link: [
         // Google Fontsの高速化のための事前接続
