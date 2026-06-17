@@ -31,12 +31,19 @@ const formatDate = (dateStr: string) => {
 
 // ページ表示時に釣果詳細とコメントを同時に取得(Promise.allで並列実行して速くする)
 onMounted(async () => {
-  const [reportData, commentData] = await Promise.all([
-    fetchReport(Number(route.params.id)),
-    fetchComments(Number(route.params.id)),
-  ]);
-  report.value = reportData.data;
-  comments.value = commentData.data;
+  try {
+    const [reportData, commentData] = await Promise.all([
+      fetchReport(Number(route.params.id)),
+      fetchComments(Number(route.params.id)),
+    ]);
+    report.value = reportData.data;
+    comments.value = commentData.data;
+  } catch (e: any) {
+    // 存在しないID等で取得に失敗したら、共通エラーページ(error.vue)を表示
+    showError({
+      statusCode: e?.statusCode || e?.response?.status || 404,
+    });
+  }
 });
 
 // 削除処理
