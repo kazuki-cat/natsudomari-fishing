@@ -43,11 +43,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // 釣果投稿(POST /api/reports)multipart/form-dataで画像も送れる
-    Route::post('/reports', [CatchReportController::class, 'store']);
+    // throttle:20,1 = 1分間に20回まで。連打での釣果投稿スパム対策
+    Route::post('/reports', [CatchReportController::class, 'store'])->middleware('throttle:20,1');
 
     // 釣果削除(DELETE /api/reports/{catchReport})自分の投稿のみ削除可
     Route::delete('/reports/{catchReport}', [CatchReportController::class, 'destroy']);
 
     // コメント投稿(POST /api/reports/{catchReport}/comments)
-    Route::post('/reports/{catchReport}/comments', [CommentController::class, 'store']);
+    // throttle:20,1 = 1分間に20回まで。連打でのコメント投稿スパム対策
+    Route::post('/reports/{catchReport}/comments', [CommentController::class, 'store'])->middleware('throttle:20,1');
 });
