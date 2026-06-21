@@ -67,6 +67,19 @@ export const useAuth = () => {
     return data;
   };
 
+  // ゲストログイン処理(登録不要でゲスト用トークンを取得)
+  const guestLogin = async () => {
+    // POST /api/guest-login → userとtokenが返る
+    const data = await $fetch<{ user: User; token: string }>(
+      "/api/guest-login",
+      { method: "POST" },
+    );
+    // 通常ログインと同じく、Cookieとステートに保存
+    token.value = data.token;
+    user.value = data.user;
+    return data;
+  };
+
   // ログアウト処理
   const logout = async () => {
     if (token.value) {
@@ -100,6 +113,7 @@ export const useAuth = () => {
     isLoggedIn,
     login,
     register,
+    guestLogin,
     logout,
     fetchUser,
     apiFetch,
