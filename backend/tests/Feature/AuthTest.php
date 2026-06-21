@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CatchReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -122,5 +123,40 @@ class AuthTest extends TestCase
     {
         $response = $this->postJson('/api/logout');
         $response->assertStatus(401);
+    }
+
+    // ゲストログインができ、user情報とtokenが返る
+    public function test_guest_can_login(): void
+    {
+        $response = $this->postJson('/api/guest-login');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['user' => ['id', 'name'], 'token']);
+
+        // ゲストユーザーがDBに作成される
+        $this->assertDatabaseHas('users', ['email' => 'guest@example.com']);
+    }
+
+    // ゲストログインのたびに、前回のゲストの投稿・コメントがリセットされる
+    public function test_guest_login_resets_previous_guest_data(): void
+    {
+        // 1回目のゲストログインでゲストユーザーを作る
+        $this->postJson('/api/guest-login')->assertStatus(200);
+        $guest = User::where('email', 'guest@example.com')->first();
+
+        // ゲストの投稿と、ゲストが他人の投稿に付けたコメントを用意
+        $ownReport = CatchReport::factory()->create(['user_id' => $guest->id]);
+        $othersReport = CatchReport::factory()->create();
+        $othersReport->comments()->create(['user_id' => $guest->id, 'body' => 'テスト']);
+
+        // 投稿・コメントが存在することを確認
+        $this->assertDatabaseHas('catch_reports', ['id' => $ownReport->id]);
+        $this->assertDatabaseHas('comments', ['user_id' => $guest->id]);
+
+        // 2回目のゲストログイン → 上のデータが消えるはず
+        $this->postJson('/api/guest-login')->assertStatus(200);
+
+        $this->assertDatabaseMissing('catch_reports', ['id' => $ownReport->id]);
+        $this->assertDatabaseMissing('comments', ['user_id' => $guest->id]);
     }
 }
