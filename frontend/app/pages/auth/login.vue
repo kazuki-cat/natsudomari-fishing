@@ -4,7 +4,7 @@ definePageMeta({ middleware: "guest" });
 
 useHead({ title: "ログイン" });
 
-const { login } = useAuth();
+const { login, guestLogin } = useAuth();
 const router = useRouter();
 
 // フォームの入力値
@@ -34,6 +34,20 @@ const onSubmit = async () => {
       // それ以外(認証失敗 422など)のメッセージ
       error.value = "メールアドレスまたはパスワードが正しくありません";
     }
+  } finally {
+    loading.value = false;
+  }
+};
+
+// ゲストでログイン処理(ボタン用)
+const onGuestLogin = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await guestLogin();
+    router.push("/"); // ログイン成功でトップへ
+  } catch {
+    error.value = "ゲストログインに失敗しました。時間をおいてお試しください。";
   } finally {
     loading.value = false;
   }
@@ -94,6 +108,29 @@ const onSubmit = async () => {
       >
         {{ loading ? "ログイン中..." : "ログイン" }}
       </button>
+
+      <!-- 区切り線 -->
+      <div class="flex items-center gap-3 text-xs text-gray-400">
+        <span class="flex-1 border-t"></span>
+        または
+        <span class="flex-1 border-t"></span>
+      </div>
+
+      <!-- ゲストでログイン -->
+      <div>
+        <button
+          type="button"
+          :disabled="loading"
+          class="w-full border border-sea-600 text-sea-600 hover:bg-sea-50 disabled:opacity-50 font-bold py-2.5 rounded-lg transition"
+          @click="onGuestLogin"
+        >
+          ゲストでログイン
+        </button>
+        <p class="text-xs text-gray-400 mt-2 text-center">
+          登録不要でお試しできます。<br />
+          次の方がゲストログインすると投稿はリセットされます。
+        </p>
+      </div>
 
       <!-- 新規登録へのリンク-->
       <p class="text-center text-sm text-gray-500">

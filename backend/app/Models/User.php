@@ -22,6 +22,13 @@ class User extends Authenticatable
         return $this->hasMany(CatchReport::class);
     }
 
+    // UserはCommentをhasMany(一対多)
+    // ゲストのコメント一括削除などで使う
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     protected $fillable = [
         'name',
         'email',

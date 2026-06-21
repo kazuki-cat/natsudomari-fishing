@@ -17,6 +17,11 @@ Route::post('/register', [AuthController::class, 'register'])->middleware('throt
 // throttle:6,1 = 1分間に6回まで。超えると429を返す(ブルートフォース対策)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
+// ゲストログイン(POST /api/guest-login)
+// 登録不要でゲスト用トークンを発行。
+// throttle:6,1 = 1分間に6回まで(1つのIPから)
+Route::post('/guest-login', [AuthController::class, 'guestLogin'])->middleware('throttle:6,1');
+
 // 天気・営業予報(GET / api/weather)
 Route::get('/weather', [WeatherController::class, 'index']);
 

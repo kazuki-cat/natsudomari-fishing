@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 // ユーザー認証に関するAPIを担当するコントローラー
@@ -66,6 +68,37 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'ログアウトしました']);
+    }
+
+    // ゲストログイン POST /api/guest-login(認証不要)
+    // 登録不要でアプリを試せる。ログインのたびに自身の過去データをリセットする
+    public function guestLogin(): JsonResponse
+    {
+        // ゲスト専用ユーザーを取得。存在しなければ自動生成する
+        $guest = User::firstOrCreate(
+            ['email' => 'guest@example.com'],
+            [
+                'name' => 'ゲストユーザー',
+                'password' => Hash::make(Str::random(32)),
+            ]
+        );
+
+        // リセット処理(ゲスト自身のデータだけ削除)
+        foreach ($guest->catchReports as $report) {
+            // 投稿画像があればストレージ(本番S3)からも削除
+            if ($report->image_path) {
+                Storage::delete($report->image_path);
+            }
+            $report->delete();
+        }
+
+        $guest->comments()->delete();
+        $guest->tokens()->delete();
+
+        // 新しいトークンを発行して返す(通常ログインと同じレスポンス形)
+        $token = $guest->createToken('auth_token')->plainTextToken;
+
+        return response()->json(['user' => $guest, 'token' => $token]);
     }
 
     // ログイン中ユーザーの情報取得 GET /api/user(要認証)
