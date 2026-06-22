@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: リポジトリのコードを取得
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: PHPをセットアップ
         uses: shivammathur/setup-php@v2
