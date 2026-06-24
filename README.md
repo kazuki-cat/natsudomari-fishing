@@ -51,7 +51,7 @@
 | 開発環境 | Docker / Docker Compose |
 | CI/CD | GitHub Actions(テスト+Pint) / Dependabot / appleboy ssh-action |
 | 開発フロー | GitHub Rulesets(ブランチ保護) / 1機能 = 1 Issue・1 PR |
-| その他 | Opcache(本番PHP高速化) / GD(画像処理) / Certbot(HTTPS自動更新) |
+| その他 | Opcache(本番PHP高速化) / GD(画像処理) / Certbot(HTTPS自動更新) / Prettier(コード整形) |
 
 
 ## 技術選定理由
