@@ -97,7 +97,7 @@ const handleLogout = async () => {
           @click="mobileOpen = false"
           >釣果を投稿</NuxtLink
         >
-        <button class=" hover:text-sea-200" @click="handleLogout">
+        <button class="hover:text-sea-200" @click="handleLogout">
           ログアウト
         </button>
       </template>

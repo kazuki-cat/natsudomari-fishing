@@ -1,0 +1,15 @@
+# 依存・ビルド成果物
+node_modules
+.output
+.nuxt
+.nitro
+.data
+.cache
+dist
+
+# 自動生成ファイル
+package-lock.json
+
+# その他
+*.log
+.DS_Store
